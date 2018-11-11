@@ -1,10 +1,11 @@
 import java.sql.*;
 
-public class CreateTables {
+public class ConnectionToDatabase {
 
 	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
 
-    public static void main(String[] args) {
+    public  ResultSet read_db(String q) {
+    	 ResultSet rs = null;
         try {
 
        // Load the driver. This creates an instance of the driver
@@ -18,7 +19,7 @@ public class CreateTables {
 
        Connection conn = null;
        Statement stmt = null;
-       ResultSet rs = null;
+      
        try {
                 // Get a connection from the first driver in the
             	// DriverManager list that recognizes the URL jdbcURL
@@ -29,16 +30,25 @@ public class CreateTables {
             	// SQL statements to the DBMS
 
             	stmt = conn.createStatement();
-                
+            	
+            	rs = stmt.executeQuery(q);
+            	//rs = stmt.executeQuery("SELECT CENTER_ID, ZIPCODE FROM CENTERS");
+            	/*while (rs.next()) {
+        		    String s = rs.getString("COF_NAME");
+        		    float n = rs.getFloat("PRICE");
+        		    System.out.println(s + "   " + n);
+        		}*/
+
+            	 
         } finally {
-        close(rs);
-        close(stmt);
-        close(conn);
+      //  close(rs);
+      //  close(stmt);
+      //  close(conn);
         } } catch(Throwable oops) {
         oops.printStackTrace();
     }
-        
-}
+      return rs;
+}//read_db method
 
     static void close(Connection conn) {
     	if(conn != null) {
