@@ -1,10 +1,13 @@
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-public class ConnectionToDatabase {
+public class DeleteQueries {
 
 	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
 
-    public  ResultSet read_db(String q) {
+    public  ResultSet delete_db(String q) {
     	 ResultSet rs = null;
         try {
 
@@ -48,7 +51,7 @@ public class ConnectionToDatabase {
         oops.printStackTrace();
     }
       return rs;
-}//read_db method
+}//delete_db method
 
     static void close(Connection conn) {
     	if(conn != null) {
