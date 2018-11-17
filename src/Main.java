@@ -1,5 +1,4 @@
-import java.sql.*;
-import java.util.Scanner;
+//import java.sql.*;
 import java.io.*;
 
 public class Main {
@@ -59,7 +58,8 @@ public class Main {
 							}
 						}
 							break;
-				case 2 :
+				case 2 :    SignUp s = new SignUp();
+							s.signup_customer();
 							break;
 				case 3 :
 							break;

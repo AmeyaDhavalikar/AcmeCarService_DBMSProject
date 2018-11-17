@@ -1,3 +1,5 @@
+import java.sql.*;
+import java.io.*;
 
 public class Login {
 	private String user_id, password;
@@ -25,12 +27,11 @@ public class Login {
 	public int validate_login()
 	{
 		//write code to query mgr, recep, cust table to find mayching user id and pwd
-		
-		int role =1;
+		int role=1;
 		String uid, pwd;
 		uid = get_user_id();
 		pwd = get_password();
-		System.out.println(uid +" "+pwd);
+		
 		return role;
 		}//method validate_login
 	
