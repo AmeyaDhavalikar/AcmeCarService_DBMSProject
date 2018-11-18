@@ -6,7 +6,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.sql.*;
 
 public class Customer
 {
@@ -137,8 +142,80 @@ public class Customer
 	void update_profile()
 	{}
 	
-	void register_car()
-	{}//register_car
+	void register_car() throws IOException
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
+			BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+			int menu_choice;
+			System.out.println("Enter Licence plate:");
+			String licencePlate = buf.readLine();
+			System.out.println("Make:");
+			String make = buf.readLine();
+			System.out.println("Model:");
+			String model = buf.readLine();
+			System.out.println("Year:");
+			String year = buf.readLine();
+			System.out.println("Purchase date:");
+			String purchaseDate = buf.readLine();
+			int customer_id = get_customer_id(email);
+			int hadResults=0;
+			do
+			{
+				System.out.println("\n 1. Register\n 2. Cancel");
+				System.out.println("Enter your choice : ");
+				menu_choice = Integer.parseInt(buf.readLine());
+				switch(menu_choice)
+				{
+					case 1 :					    
+				             try
+				             {
+						     Class.forName("oracle.jdbc.driver.OracleDriver");
+				             String user = "schippa";	// For example, "jsmith"
+				             String passwd = "200262831";	// Your 9 digit student ID number or password
+							 
+							 Connection conn = null;
+					         Statement stmt = null;
+					         PreparedStatement p_st = null;
+					         ResultSet rs = null;
+					         try 
+					         {
+					          		conn = DriverManager.getConnection(jdbcURL, user, passwd);
+					          		stmt = conn.createStatement();
+//					          		rs = stmt.executeQuery("SELECT MAX(CUSTOMER_ID) AS C_ID FROM CUSTOMERS");
+//				            		int customer_id=0;
+//				            		while (rs.next()) {
+//				            			customer_id = rs.getInt("C_ID");
+//				            		}
+//				            		customer_id = customer_id+1;
+					          		String q = "INSERT INTO VEHICLES(CUSTOMER_ID, LICENCE_PLATE_NO, MANUFACTURER, MODEL, YEAR, DATE_OF_PURCHASE)"+
+					          		            "VALUES (?,?,?,?,?,?)";
+					          		p_st = conn.prepareStatement(q);
+				            		p_st.setInt(1,customer_id);
+				            		p_st.setString(2,licencePlate);
+				            		p_st.setString(3, make.toUpperCase());
+				            		p_st.setString(4, model);
+				            		p_st.setInt(5, Integer.parseInt(year));
+				            		LocalDate sqlDate = LocalDate.parse(purchaseDate, formatter);
+				            		p_st.setDate(6, java.sql.Date.valueOf(sqlDate));
+				            		hadResults = p_st.executeUpdate();
+					            } //try 
+					            finally {
+					                close(rs);
+					                close(stmt);
+					                close(conn);
+					            }
+					        } catch(Throwable oops) {
+					            oops.printStackTrace();}
+				             if (hadResults==1) {
+				            	 System.out.println("Car is successfully registered!!!!");
+				             }
+				             break;
+					case 2 : break;
+					default : System.out.println("Invalid choice entered. Please try again!");
+				}//switch
+			}while(menu_choice!=2);
+			
+	}//register_car
 	
 	void service()
 	{}//service
