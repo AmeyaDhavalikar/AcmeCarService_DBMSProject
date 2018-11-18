@@ -150,17 +150,12 @@ public class Receptionist
 		    String street = rs.getString("STREET");
 		    String state = rs.getString("STATE");
 		    long zipcode = rs.getLong("ZIPCODE");
-		    String email = rs.getString("EMAIL");
-		    //float salary = rs.getFloat("SALARY");
-		    //String works_in_center = rs.getString("CENTER_ID");
+		    String email = rs.getString("EMAIL");	   
 		    System.out.println("Customer id: " + customer_id);
 		    System.out.println("Name: " + name);
 		    System.out.println("Phone number: " + phone_number);
 		    System.out.println("Address : " + street + ", "+ city + ", " + state + ", " + zipcode);
-		    System.out.println("Email address : " + email);
-		    //System.out.println("Service Center :" + works_in_center);
-		    //System.out.println("Compensation :" + salary);
-		    //System.out.println("Salary frequency: Monthly" );
+		    System.out.println("Email address : " + email);		  
 		}//while
 		}catch(Throwable oops)
 		{
@@ -178,20 +173,7 @@ public class Receptionist
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
 			BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 			int menu_choice;
-			System.out.println("Enter email address");
-			String email = buf.readLine();
-			System.out.println("Enter Licence plate:");
-			String licencePlate = buf.readLine();
-			System.out.println("Make:");
-			String make = buf.readLine();
-			System.out.println("Model:");
-			String model = buf.readLine();
-			System.out.println("Year:");
-			String year = buf.readLine();
-			System.out.println("Purchase date:");
-			String purchaseDate = buf.readLine();
-			int customer_id = new Customer(email).get_customer_id(email);
-			int hadResults=0;
+			
 			do
 			{
 				System.out.println("\n 1. Register\n 2. Cancel");
@@ -199,12 +181,25 @@ public class Receptionist
 				menu_choice = Integer.parseInt(buf.readLine());
 				switch(menu_choice)
 				{
-					case 1 :					    
+					case 1 :	System.out.println("Enter email address");
+								String email = buf.readLine();
+								System.out.println("Enter Licence plate:");
+								String licencePlate = buf.readLine();
+								System.out.println("Make:");
+								String make = buf.readLine();
+								System.out.println("Model:");
+								String model = buf.readLine();
+								System.out.println("Year:");
+								String year = buf.readLine();
+								System.out.println("Purchase date:");
+								String purchaseDate = buf.readLine();
+								int customer_id = new Customer(email).get_customer_id(email);
+								int hadResults=0;				    
 				             try
 				             {
 						     Class.forName("oracle.jdbc.driver.OracleDriver");
-				             String user = "schippa";	// For example, "jsmith"
-				             String passwd = "200262831";	// Your 9 digit student ID number or password
+				             String user = "adhaval";	// For example, "jsmith"
+				             String passwd = "200263183";	// Your 9 digit student ID number or password
 							 
 							 Connection conn = null;
 					         Statement stmt = null;
