@@ -147,18 +147,7 @@ public class Customer
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d-MM-yyyy");
 			BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 			int menu_choice;
-			System.out.println("Enter Licence plate:");
-			String licencePlate = buf.readLine();
-			System.out.println("Make:");
-			String make = buf.readLine();
-			System.out.println("Model:");
-			String model = buf.readLine();
-			System.out.println("Year:");
-			String year = buf.readLine();
-			System.out.println("Purchase date:");
-			String purchaseDate = buf.readLine();
-			int customer_id = get_customer_id(email);
-			int hadResults=0;
+			
 			do
 			{
 				System.out.println("\n 1. Register\n 2. Cancel");
@@ -166,12 +155,24 @@ public class Customer
 				menu_choice = Integer.parseInt(buf.readLine());
 				switch(menu_choice)
 				{
-					case 1 :					    
+					case 1 :	
+							System.out.println("Enter Licence plate:");
+							String licencePlate = buf.readLine();
+							System.out.println("Make:");
+							String make = buf.readLine();
+							System.out.println("Model:");
+							String model = buf.readLine();
+							System.out.println("Year:");
+							String year = buf.readLine();
+							System.out.println("Purchase date:");
+							String purchaseDate = buf.readLine();
+							int customer_id = get_customer_id(email);
+							int hadResults=0;
 				             try
 				             {
 						     Class.forName("oracle.jdbc.driver.OracleDriver");
-				             String user = "schippa";	// For example, "jsmith"
-				             String passwd = "200262831";	// Your 9 digit student ID number or password
+				             String user = "adhaval";	// For example, "jsmith"
+				             String passwd = "200263183";	// Your 9 digit student ID number or password
 							 
 							 Connection conn = null;
 					         Statement stmt = null;
