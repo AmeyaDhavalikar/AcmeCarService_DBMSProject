@@ -139,11 +139,12 @@ public class Receptionist
 		String email_address = buf.readLine();
 		String q = "SELECT customer_id,name,city,street,state,zipcode,email,phone_number from Customers where customer_id="+"'"+email_address+"'";
 		ResultSet rs;
+		int customer_id=0;
 		ReadQueries obj = new ReadQueries();
 		rs = obj.read_db(q);
 		try {
 		while (rs.next()) {
-		    int customer_id = rs.getInt("CUSTOMER_ID");
+		    customer_id = rs.getInt("CUSTOMER_ID");
 		    String name = rs.getString("NAME");
 		    long phone_number = rs.getLong("PHONE_NUMBER");
 		    String city = rs.getString("CITY");
@@ -157,6 +158,8 @@ public class Receptionist
 		    System.out.println("Address : " + street + ", "+ city + ", " + state + ", " + zipcode);
 		    System.out.println("Email address : " + email);		  
 		}//while
+		Customer ob = new Customer(email_address);
+		ob.get_cars(customer_id);
 		}catch(Throwable oops)
 		{
 			oops.printStackTrace();

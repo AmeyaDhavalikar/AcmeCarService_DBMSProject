@@ -116,7 +116,7 @@ public class Customer
 		rs = obj.read_db(q);
 		try {
 			while (rs.next()) {
-				
+				System.out.println("--------------------------------------------------------------------------------");
 			    String licence_plate_no = rs.getString("LICENCE_PLATE_NO");
 			    String make = rs.getString("MANUFACTURER");
 			    String model = rs.getString("MODEL");
@@ -154,7 +154,7 @@ public class Customer
 			    	System.out.println("NULL");
 			    }
 			    
-			    System.out.println("--------------------------------------------------------------------------------");
+			    
 			}//while
 			}catch(Throwable oops)
 			{
