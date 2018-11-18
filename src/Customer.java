@@ -1,17 +1,55 @@
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class Customer
 {
-	private int user_id;
+	private String email;
+	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
 	
 	Customer(String uid)
 	{
-		user_id = Integer.parseInt(uid);
+		email = uid;
+		
 	}
+	
+	public int get_customer_id(String uid)
+	{
+		int customer_id =0;
+		try
+        {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			String user = "adhaval";	// For example, "jsmith"
+			String passwd = "200263183";	// Your 9 digit student ID number or password
+			
+			Connection conn = null;
+			Statement stmt = null;
+            ResultSet rs = null;
+            try 
+            {
+            	conn = DriverManager.getConnection(jdbcURL, user, passwd);
+            	stmt = conn.createStatement();
+			    String q = "SELECT CUSTOMER_ID FROM CUSTOMERS WHERE EMAIL = "+"'"+uid +"'";
+			    rs = stmt.executeQuery(q);
+			    while (rs.next()) 
+			    {
+			    	customer_id = rs.getInt("CUSTOMER_ID");
+			    }//while
+            
+        }finally {
+            close(rs);
+            close(stmt);
+            close(conn);
+        }
+    } catch(Throwable oops) {
+        oops.printStackTrace();}
+		return customer_id;
+	}//get customer id
 	
 	public void show()throws IOException
 	{
@@ -67,7 +105,7 @@ public class Customer
 	
 	void view_profile()
 	{
-		String q = "SELECT customer_id,name,city,street,state,zipcode,email,phone_number from Customers where customer_id="+"'"+user_id+"'";
+		String q = "SELECT customer_id,name,city,street,state,zipcode,email,phone_number from Customers where email="+"'"+email+"'";
 		ResultSet rs;
 		ReadQueries obj = new ReadQueries();
 		rs = obj.read_db(q);
@@ -107,4 +145,21 @@ public class Customer
 	void invoices()
 	{}//invoices
 	
+	static void close(Connection conn) {
+        if(conn != null) {
+            try { conn.close(); } catch(Throwable whatever) {}
+        }
+    }
+
+    static void close(Statement st) {
+        if(st != null) {
+            try { st.close(); } catch(Throwable whatever) {}
+        }
+    }
+
+    static void close(ResultSet rs) {
+        if(rs != null) {
+            try { rs.close(); } catch(Throwable whatever) {}
+        }
+    }
 }//Customer class

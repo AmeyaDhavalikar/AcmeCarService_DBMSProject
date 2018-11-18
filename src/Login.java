@@ -37,25 +37,47 @@ public class Login {
         String user = "adhaval";	// For example, "jsmith"
         String passwd = "200263183";	// Your 9 digit student ID number or password
 		 
-		Connection conn = null;
-        Statement stmt = null;
+		Connection conn, conn2 = null;
+        Statement stmt1,stmt2 = null;
         //PreparedStatement p_st = null;
-        ResultSet rs = null;
+        ResultSet rs1,rs2 = null;
         try 
         {
-         		conn = DriverManager.getConnection(jdbcURL, user, passwd);
-         		stmt = conn.createStatement();
+        	if(uid.contains("@gmail.com"))
+        	{
+        	    
+     			conn2 = DriverManager.getConnection(jdbcURL, user, passwd);
+     			stmt2 = conn2.createStatement();
+     			String q1 = "SELECT EMAIL FROM CUSTOMERS WHERE EMAIL = "+"'"+uid +"'"+ " AND PASSWORD = " + pwd;
+            	rs2 = stmt2.executeQuery(q1);
+           		while (rs2.next()) 
+           		{
+         			role = rs2.getString("EMAIL");
+            	}//while
+           		
+        	}
+        	else
+        	{
+        		conn = DriverManager.getConnection(jdbcURL, user, passwd);
+         		stmt1 = conn.createStatement();
          		String q = "SELECT ROLE FROM EMPLOYEES WHERE EMPLOYEE_ID = "+uid + "AND PASSWORD = " + pwd;
-         		rs = stmt.executeQuery(q);
-       		while (rs.next()) {
-       			role = rs.getString("ROLE");
-       		} 
-       								
+         		rs1 = stmt1.executeQuery(q);
+         		
+         		
+         			while (rs1.next()) {
+         				role = rs1.getString("ROLE");
+         			}//while
+         			close(rs1);
+                    close(stmt1);
+                    close(conn);
+         		
+         	 
+         		}//else      								
            } //try 
            finally {
-               close(rs);
-               close(stmt);
-               close(conn);
+               close(rs2);
+               close(stmt2);
+               close(conn2);
            }
        } catch(Throwable oops) {
            oops.printStackTrace();}

@@ -30,7 +30,6 @@ public class Main {
 							System.out.println("Enter user id : ");
 							uid = buf.readLine();
 							obj.set_user_id(uid);
-							System.out.println("Got user id");
 							System.out.println("Enter password : ");
 							pwd = buf.readLine();
 							obj.set_password(pwd);
@@ -47,7 +46,7 @@ public class Main {
 								Receptionist r = new Receptionist(uid);
 								r.show();
 							}
-							else if (role.equals("Customer"))
+							else if (role.equals(uid))
 							{	//display Customer menu
 								Customer c = new Customer(uid);
 								c.show();
