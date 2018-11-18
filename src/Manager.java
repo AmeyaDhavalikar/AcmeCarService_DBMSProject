@@ -1,10 +1,12 @@
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
 import java.util.Date;
+import java.time.*;
 
 public class Manager {
-	
+	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
 	private String user_id;
 	
 	Manager(String uid)
@@ -152,17 +154,12 @@ public class Manager {
 		    String street = rs.getString("STREET");
 		    String state = rs.getString("STATE");
 		    long zipcode = rs.getLong("ZIPCODE");
-		    String email = rs.getString("EMAIL");
-		    //float salary = rs.getFloat("SALARY");
-		    //String works_in_center = rs.getString("CENTER_ID");
+		    String email = rs.getString("EMAIL");		    
 		    System.out.println("Customer id: " + customer_id);
 		    System.out.println("Name: " + name);
 		    System.out.println("Phone number: " + phone_number);
 		    System.out.println("Address : " + street + ", "+ city + ", " + state + ", " + zipcode);
-		    System.out.println("Email address : " + email);
-		    //System.out.println("Service Center :" + works_in_center);
-		    //System.out.println("Compensation :" + salary);
-		    //System.out.println("Salary frequency: Monthly" );
+		    System.out.println("Email address : " + email);		    
 		}//while
 		}catch(Throwable oops)
 		{
@@ -172,8 +169,119 @@ public class Manager {
 
 	}//view_customer_profile
 	
-	void add_new_employees()
-	{}//add_new_employee method
+	void add_new_employees()throws IOException
+	{
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		int menu_choice,choice;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		String role = "";
+		String center_id = "";
+		do
+		{
+			System.out.println("\n 1. Add new employee\n 2. Go Back");
+			System.out.println("Enter your choice : ");
+			menu_choice = Integer.parseInt(buf.readLine());
+			switch(menu_choice)
+			{
+				case 1 :		
+						System.out.println("Enter name :");
+						String name = buf.readLine();
+						System.out.println("Address details :");
+						System.out.println("Enter street :");
+						String street = buf.readLine();
+						System.out.println("Enter city :");
+						String city = buf.readLine();
+						System.out.println("Enter state :");
+						String state = buf.readLine();
+						System.out.println("Enter zipcode :");
+						int zipcode = Integer.parseInt(buf.readLine());
+						System.out.println("Enter email address : ");
+						String email_id = buf.readLine();		
+						System.out.println("Enter phone number :");
+						long phone_number = Long.parseLong(buf.readLine());		
+						do {
+								System.out.println("Enter role :\n 1. Mechanic \n 2. Receptionist");
+								choice = Integer.parseInt(buf.readLine());
+								if(choice==1)
+								{
+									role = "Mechanic";
+									break;
+								}
+								else if(choice == 2)
+								{
+									System.out.println("A receptionist already exists in this center. Cannot add employee with this role");
+								}
+								else 
+									System.out.println("Invalid choice entered. Try again!");
+						}while(choice!=1);
+						System.out.println("Enter start date(in dd-MM-yyyy format) : ");
+						String start_date = buf.readLine();
+						System.out.println("Enter compensation (hourly_rate) :");
+						float salary = Float.parseFloat(buf.readLine());   
+			             try
+			             {
+			            	 Class.forName("oracle.jdbc.driver.OracleDriver");
+			            	 String user = "adhaval";	// For example, "jsmith"
+			            	 String passwd = "200263183";	// Your 9 digit student ID number or password
+			            	 Connection conn=null,conn1 = null;
+			            	 Statement stmt=null,stmt1 = null;
+			            	 PreparedStatement p_st = null;
+			            	 ResultSet rs = null,rs1 = null;
+			            	 try 
+			            	 {
+				        	 	String password = "12345678";
+				          		conn = DriverManager.getConnection(jdbcURL, user, passwd);
+				          		stmt = conn.createStatement();
+				          		rs = stmt.executeQuery("SELECT MAX(EMPLOYEE_ID) AS E_ID FROM EMPLOYEES");
+			            		int employee_id=0;
+			            		while (rs.next()) {
+			            			employee_id = rs.getInt("E_ID");
+			            		}
+			            			employee_id = employee_id+1;
+			            		conn1 = DriverManager.getConnection(jdbcURL, user, passwd);
+					          	stmt1 = conn1.createStatement();
+					          	String q1 = "SELECT CENTER_ID AS FROM EMPLOYEES WHERE EMPLOYEE_ID = '"+user_id+"'"; 
+					          	rs1 = stmt1.executeQuery(q1);
+					          	while(rs1.next())
+					          	{
+					          		center_id = rs1.getString("CENTER_ID");
+					          	}	
+					          	close(rs1);
+					          	close(conn1);
+					          	close(stmt1);
+				          		String q = "INSERT INTO EMPLOYEES(EMPLOYEE_ID, NAME, PHONE_NUMBER, CITY, STATE, STREET, ZIPCODE, EMAIL, PASSWORD, START_DATE, ROLE, HOURLY_RATE, CENTER_ID)"+
+				          		            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				          		p_st = conn.prepareStatement(q);
+			            		p_st.setInt(1,employee_id);
+			            		p_st.setString(2,name);
+			            		p_st.setLong(3, phone_number);
+			            		p_st.setString(4, city);
+			            		p_st.setString(5, state);
+			            		p_st.setString(6, street);
+			            		p_st.setInt(7, zipcode);
+			            		p_st.setString(8, email_id);
+			            		p_st.setString(9, password);
+			            		LocalDate sqlDate = LocalDate.parse(start_date, formatter);
+			            		p_st.setDate(10, java.sql.Date.valueOf(sqlDate));
+			            		p_st.setString(11, role);
+			            		p_st.setFloat(12, salary);
+			            		p_st.setString(13, center_id);
+			            		p_st.executeUpdate();						
+				            } //try 
+				            finally {
+				                close(rs);
+				                close(stmt);
+				                close(conn);
+				            }
+				        } catch(Throwable oops) {
+				            oops.printStackTrace();}
+			             System.out.println("Account successfully created!! Please login again to proceed.");
+			             break;
+				case 2 : break;
+				default : System.out.println("Invalid choice entered. Please try again!");
+			}//switch
+		}while(menu_choice!=2);	
+	}//add_new_employee method
 
 	void payroll()throws IOException
 	{/*
@@ -267,4 +375,21 @@ public class Manager {
 	void invoices()
 	{}//invoices
 	
+	 static void close(Connection conn) {
+	        if(conn != null) {
+	            try { conn.close(); } catch(Throwable whatever) {}
+	        }
+	    }
+
+	    static void close(Statement st) {
+	        if(st != null) {
+	            try { st.close(); } catch(Throwable whatever) {}
+	        }
+	    }
+
+	    static void close(ResultSet rs) {
+	        if(rs != null) {
+	            try { rs.close(); } catch(Throwable whatever) {}
+	        }
+	    }
 }//Manager class
