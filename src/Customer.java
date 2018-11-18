@@ -109,15 +109,70 @@ public class Customer
 		}while(profile_choice!=3);
 	}//profile method
 	
+	public void get_cars(int customer_id) {
+		String q="select LICENCE_PLATE_NO, MANUFACTURER, MODEL, YEAR, DATE_OF_PURCHASE,DATE_OF_LAST_SERVICE,MILEAGE_OF_LAST_SERVICE,TYPE_OF_LAST_SERVICE,REPAIRED_PROBLEM from vehicles where customer_id="+customer_id;
+		ResultSet rs;
+		ReadQueries obj = new ReadQueries();
+		rs = obj.read_db(q);
+		try {
+			while (rs.next()) {
+				
+			    String licence_plate_no = rs.getString("LICENCE_PLATE_NO");
+			    String make = rs.getString("MANUFACTURER");
+			    String model = rs.getString("MODEL");
+			    int year = rs.getInt("YEAR");
+			    String datePurchase = rs.getDate("DATE_OF_PURCHASE").toString();
+			    String mileage="";
+			    String dateLastService="";
+			    if (rs.getDate("DATE_OF_LAST_SERVICE")!=null) {
+			    	dateLastService = rs.getDate("DATE_OF_LAST_SERVICE").toString();
+			    }
+			    if (rs.getDate("MILEAGE_OF_LAST_SERVICE")!=null) {
+			    	mileage = rs.getDate("MILEAGE_OF_LAST_SERVICE").toString();
+			    }
+			    String typeOfService = rs.getString("TYPE_OF_LAST_SERVICE");
+			    String repairedProblem = rs.getString("REPAIRED_PROBLEM");
+			    //long zipcode = rs.getLong("DATE_OF_PURCHASE");
+			    //String email = rs.getString("EMAIL");
+			    System.out.println("Licence Plate no: " + licence_plate_no);
+			    System.out.println("Make: " + make);
+			    System.out.println("Model: " + model);
+			    System.out.println("Year: " + year);
+			    System.out.println("Date of purchase: "+datePurchase);
+			    System.out.print("Latest Service info: ");
+			    if(dateLastService!="") {
+			    	System.out.print(mileage+" miles");
+			    	if(typeOfService=="R") {
+			    		System.out.print(repairedProblem+" on ");
+			    	}
+			    	else {
+			    		System.out.print("Serivce "+ typeOfService+"on ");
+			    	}
+			    	System.out.println(dateLastService);
+			    }
+			    else {
+			    	System.out.println("NULL");
+			    }
+			    
+			    System.out.println("--------------------------------------------------------------------------------");
+			}//while
+			}catch(Throwable oops)
+			{
+				oops.printStackTrace();
+			}
+			System.out.println("");
+	}
+	
 	void view_profile()
 	{
 		String q = "SELECT customer_id,name,city,street,state,zipcode,email,phone_number from Customers where email="+"'"+email+"'";
 		ResultSet rs;
 		ReadQueries obj = new ReadQueries();
 		rs = obj.read_db(q);
+		int customer_id=0;
 		try {
 		while (rs.next()) {
-		    int customer_id = rs.getInt("CUSTOMER_ID");
+		    customer_id = rs.getInt("CUSTOMER_ID");
 		    String name = rs.getString("NAME");
 		    long phone_number = rs.getLong("PHONE_NUMBER");
 		    String city = rs.getString("CITY");
@@ -131,6 +186,7 @@ public class Customer
 		    System.out.println("Address : " + street + ", "+ city + ", " + state + ", " + zipcode);
 		    System.out.println("Email address : " + email);
 		}//while
+		get_cars(customer_id);
 		}catch(Throwable oops)
 		{
 			oops.printStackTrace();
@@ -139,6 +195,7 @@ public class Customer
 		
 	}//view_profile
 
+	
 	void update_profile()
 	{}
 	
