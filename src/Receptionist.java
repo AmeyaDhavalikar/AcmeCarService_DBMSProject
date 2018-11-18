@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 import java.io.*;
 
@@ -34,7 +36,7 @@ public class Receptionist
 			menu_choice = Integer.parseInt(buf.readLine());
 			switch(menu_choice)
 			{
-				case 1 :
+				case 1 : profile();
 						break;
 				case 2 :
 						break;
@@ -84,7 +86,7 @@ public class Receptionist
 
 	void view_profile()
 	{
-		String q = "SELECT employee_id,name,phone_number,city,street,state,zipcode,email,salary,center_id from Receptionists where employee_id="+"'"+user_id+"'";
+		String q = "SELECT employee_id,name,phone_number,city,street,state,zipcode,email,salary,start_date, role,center_id from EMPLOYEES where employee_id="+"'"+user_id+"'";
 		ResultSet rs;
 		ReadQueries obj = new ReadQueries();
 		rs = obj.read_db(q);
@@ -99,15 +101,21 @@ public class Receptionist
 		    long zipcode = rs.getLong("ZIPCODE");
 		    String email = rs.getString("EMAIL");
 		    float salary = rs.getFloat("SALARY");
+		    String role = rs.getString("ROLE");
+		    Date date = rs.getDate("START_DATE");
+		    SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+		    String start_date = DATE_FORMAT.format(date);
 		    String works_in_center = rs.getString("CENTER_ID");
 		    System.out.println("Employee id: " + emp_id);
 		    System.out.println("Name: " + name);
-		    System.out.println("Phone number: " + phone_number);
 		    System.out.println("Address : " + street + ", "+ city + ", " + state + ", " + zipcode);
 		    System.out.println("Email address : " + email);
-		    System.out.println("Service Center :" + works_in_center);
-		    System.out.println("Compensation :" + salary);
-		    System.out.println("Salary frequency: Monthly" );
+		    System.out.println("Phone number : " + phone_number);
+		    System.out.println("Role : " + role);
+		    System.out.println("Start date : " + start_date);
+		    System.out.println("Service Center : " + works_in_center);
+		    System.out.println("Compensation : " + salary);
+		    System.out.println("Salary frequency : Monthly" );
 		}//while
 		}catch(Throwable oops)
 		{
