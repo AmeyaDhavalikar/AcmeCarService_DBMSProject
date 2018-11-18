@@ -7,7 +7,7 @@ public class Main {
 	{
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		int main_menu_choice =0, login_menu_choice=0;
-		int role;
+		String role;
 		String uid, pwd;
 		do
 		{
@@ -35,19 +35,19 @@ public class Main {
 							pwd = buf.readLine();
 							obj.set_password(pwd);
 							role = obj.validate_login();
-							if(role == 1)
+							if(role.equals("Manager"))
 							{
 								//Display Manager menu
 								Manager mgr = new Manager(uid);
 								mgr.show();							
 							}
-							else if (role == 2)
+							else if (role.equals("Receptionist"))
 							{
 								//display Receptionist menu
-								//Receptionist r = new Receptionist(");
-								//r.show();
+								Receptionist r = new Receptionist(uid);
+								r.show();
 							}
-							else if (role == 3)
+							else if (role.equals("Customer"))
 							{	//display Customer menu
 								Customer c = new Customer(uid);
 								c.show();
@@ -55,6 +55,7 @@ public class Main {
 							else
 							{
 								//no user found / or handling incorrect username/pwd
+								System.out.println("No user found with this user_id and password. Please try again!");
 							}
 						}
 							break;
