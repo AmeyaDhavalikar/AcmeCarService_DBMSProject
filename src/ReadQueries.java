@@ -15,7 +15,7 @@ public class ReadQueries {
        Class.forName("oracle.jdbc.driver.OracleDriver");
             
        String user = "adhaval";	// For example, "jsmith"
-       String passwd = "200263831";	// Your 9 digit student ID number or password
+       String passwd = "200263183";	// Your 9 digit student ID number or password
 
        Connection conn = null;
        Statement stmt = null;

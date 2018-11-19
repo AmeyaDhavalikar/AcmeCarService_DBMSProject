@@ -1,4 +1,4 @@
-
+import java.util.ArrayList;
 import java.io.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -275,10 +276,202 @@ public class Customer
 			
 	}//register_car
 	
-	void service()
-	{}//service
+	public void service()throws IOException
+	{
+		int profile_choice;
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		do
+		{
+			System.out.println("1. View Service History");
+			System.out.println("2. Schedule service");
+			System.out.println("3. Reschedule service");
+			System.out.println("4. Go back");
+			System.out.println("Enter your choice: ");
+			profile_choice = Integer.parseInt(buf.readLine());
+			switch(profile_choice)
+			{
+				case 1 : view_service_history();
+						 break;
+				case 2 : schedule_service();
+						 break;
+				case 3 : reschedule_service();
+						 break;
+				case 4 : break;
+				default : System.out.println("Invalid choice entered");
+			}//switch
+		}while(profile_choice!=4);
+	}//service
 	
-	void invoices()
+	public void view_service_history()
+	{}//view_service_history
+	
+	public void schedule_service()throws IOException
+	{
+		int cnt =0;
+		int profile_choice;
+		String model = null, manufacturer = null;
+		String user = "adhaval";	// For example, "jsmith"
+		String passwd = "200263183";
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("To begin scheduling, enter your car details as follows :");
+		System.out.println("---------------------------------------------------------");
+		do
+		{
+			System.out.println("Enter license plate no : ");		
+			String license_plate_no = buf.readLine();
+			Connection conn =null;
+			Statement stmm = null;
+			ResultSet r2 = null;
+			try
+			{
+				conn = DriverManager.getConnection(jdbcURL, user, passwd);
+				stmm = conn.createStatement();
+				int customer_id = get_customer_id(email);   		
+				String query = "SELECT MODEL, MANUFACTURER FROM VEHICLES WHERE LICENCE_PLATE_NO = '"+license_plate_no+"' AND CUSTOMER_ID = '"+customer_id+"'"; 
+				r2 = stmm.executeQuery(query);
+				while(r2.next())
+				{
+					model = r2.getString("MODEL");
+					manufacturer = r2.getString("MANUFACTURER");
+				}//while	
+				close(r2);
+				close(conn);
+				close(stmm);
+			}catch(Throwable oops)
+			{
+				oops.printStackTrace();
+			}
+			if(model==null && manufacturer ==null)
+				System.out.println("The license plate number entered is incorrect. Please try again!");
+		}while(model==null && manufacturer ==null);
+		System.out.println("Enter current mileage : ");
+		int current_mileage = Integer.parseInt(buf.readLine());
+		System.out.println("Do you want a specific mechanic? Enter Y/y or N/n");
+		String m_choice = buf.readLine();
+		if(m_choice.equalsIgnoreCase("y"))
+		{
+			Connection con =null;
+			Statement stm = null;
+			ResultSet r1 = null;
+	    	try
+	    	{
+	    	Class.forName("oracle.jdbc.driver.OracleDriver");
+			con = DriverManager.getConnection(jdbcURL, user, passwd);
+          	stm = con.createStatement();
+          	String center_id = "";
+          	String query = "SELECT CENTER_ID FROM CUSTOMERS WHERE EMAIL = '"+email+"'"; 
+          	r1 = stm.executeQuery(query);
+          	while(r1.next())
+          	{
+          		center_id = r1.getString("CENTER_ID");
+          	}//while	
+          	close(r1);
+          	close(con);
+          	close(stm);
+			String q = "SELECT name from Employees where role = 'Mechanic' and center_id ='"+center_id+"'";
+			ResultSet rs;
+			ReadQueries obj = new ReadQueries();
+			rs = obj.read_db(q);
+			int count=0;
+			while (rs.next()) {
+				count++;
+				System.out.println(count +". " +rs.getString("NAME"));
+			 	}//while
+	    	}catch(Throwable oops)
+			{
+				oops.printStackTrace();
+			}
+			System.out.println("Enter mechanic's name :");
+			String performing_mechanic = buf.readLine();
+		}//if
+		do
+		{
+			System.out.println("1. Schedule Maintenance Service");
+			System.out.println("2. Schedule Repair service");
+			System.out.println("3. Go back");			
+			System.out.println("Enter your choice: ");
+			profile_choice = Integer.parseInt(buf.readLine());
+			switch(profile_choice)
+			{
+				case 1 : schedule_maintenance();
+						 break;
+				case 2 : schedule_repair(model, manufacturer);
+						 break;
+				case 3 : break;			
+				default : System.out.println("Invalid choice entered");
+			}//switch
+		}while(profile_choice!=3);
+	}//schedule service
+	
+	public void schedule_maintenance()
+	{}
+	
+	public void schedule_repair(String model, String manufacturer)throws IOException
+	{
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		int menu_choice;
+		do
+		{
+			System.out.println("Select which problem you are facing :");
+			System.out.println("1. Engine Knock");
+			System.out.println("2. Car drifts in a particular direction");
+			System.out.println("3. Battery does not hold charge");
+			System.out.println("4. Black/unclean exhaust");
+			System.out.println("5. A/C-Heater not working");
+			System.out.println("6. Headlamps/Tail lamps");
+			System.out.println("7. Check engine light");
+			System.out.println("8. Go back");
+			System.out.println("Enter your choice:");
+		    menu_choice = Integer.parseInt(buf.readLine());
+			if(menu_choice>0 && menu_choice<8)
+			{
+				diagnostic_report(menu_choice,model,manufacturer);
+			}//if
+			else
+			{
+				break;
+			}//else
+		}while(menu_choice!=8);
+	}//schedule_repair 
+	
+	public void diagnostic_report(int prob_num, String model, String manufacturer)
+	{
+		String specific_problem="", diagnostic="";
+		ArrayList<String> basic_services = new ArrayList<String>();
+		float diagnostic_fee= 0;
+		String q = "SELECT specific_problem,diagnostic,diagnostic_fee,basic_service_name from Repair_manual where manual_id="+"'"+prob_num+"'";
+		ResultSet rs;
+		ReadQueries obj = new ReadQueries();
+		rs = obj.read_db(q);
+		int customer_id=0;
+		try {
+			int i=0;
+		while (rs.next()) {
+		    specific_problem = rs.getString("SPECIFIC_PROBLEM");
+		    diagnostic = rs.getString("DIAGNOSTIC");
+		    diagnostic_fee = rs.getFloat("DIAGNOSTIC_FEE");
+		    basic_services.add(rs.getString("BASIC_SERVICE_NAME"));
+		}//while
+		}catch(Throwable oops)
+		{
+			oops.printStackTrace();
+		}
+		System.out.println("-------------------------------------------------------------------------");
+		System.out.println("----------------------------DIAGNOSTIC REPORT----------------------------");
+		System.out.println("-------------------------------------------------------------------------");
+		System.out.println("Problem faced : "+specific_problem);
+		System.out.println("Diagnostic : "+diagnostic);
+		System.out.println("Diagnostic fee : "+diagnostic_fee);
+		System.out.println("Basic services needed : ");
+		for(int i=0;i<basic_services.size();i++)
+			System.out.println(i+1+ ". "+basic_services.get(i));
+	}//diagnostic_report
+	
+	public void reschedule_service()
+	{}//reschedule service
+	
+	
+	public void invoices()
 	{}//invoices
 	
 	static void close(Connection conn) {
