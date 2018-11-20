@@ -12,7 +12,9 @@ import java.io.*;
 
 public class Receptionist 
 {
-	
+	public String user = "adhaval";	// For example, "jsmith"
+    public String passwd = "200263183";	// Your 9 digit student ID number or password
+     
 	private String user_id;
 	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
 	Receptionist(String uid)
@@ -200,10 +202,7 @@ public class Receptionist
 								int hadResults=0;				    
 				             try
 				             {
-						     Class.forName("oracle.jdbc.driver.OracleDriver");
-				             String user = "adhaval";	// For example, "jsmith"
-				             String passwd = "200263183";	// Your 9 digit student ID number or password
-							 
+						     Class.forName("oracle.jdbc.driver.OracleDriver");				       				 
 							 Connection conn = null;
 					         Statement stmt = null;
 					         PreparedStatement p_st = null;
@@ -212,12 +211,6 @@ public class Receptionist
 					         {
 					          		conn = DriverManager.getConnection(jdbcURL, user, passwd);
 					          		stmt = conn.createStatement();
-//					          		rs = stmt.executeQuery("SELECT MAX(CUSTOMER_ID) AS C_ID FROM CUSTOMERS");
-//				            		int customer_id=0;
-//				            		while (rs.next()) {
-//				            			customer_id = rs.getInt("C_ID");
-//				            		}
-//				            		customer_id = customer_id+1;
 					          		String q = "INSERT INTO VEHICLES(CUSTOMER_ID, LICENCE_PLATE_NO, MANUFACTURER, MODEL, YEAR, DATE_OF_PURCHASE)"+
 					          		            "VALUES (?,?,?,?,?,?)";
 					          		p_st = conn.prepareStatement(q);

@@ -41,9 +41,9 @@ public class ReadQueries {
 
             	 
         } finally {
-      //  close(rs);
-      //  close(stmt);
-      //  close(conn);
+        //close(rs);
+        //close(stmt);
+        //close(conn);
         } } catch(Throwable oops) {
         oops.printStackTrace();
     }

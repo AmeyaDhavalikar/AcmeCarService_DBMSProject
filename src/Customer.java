@@ -19,6 +19,9 @@ public class Customer
 	private String email;
 	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
 	
+	 public String user = "adhaval";	// For example, "jsmith"
+     public String passwd = "200263183";	// Your 9 digit student ID number or password
+	
 	Customer(String uid)
 	{
 		email = uid;
@@ -31,9 +34,6 @@ public class Customer
 		try
         {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String user = "adhaval";	// For example, "jsmith"
-			String passwd = "200263183";	// Your 9 digit student ID number or password
-			
 			Connection conn = null;
 			Statement stmt = null;
             ResultSet rs = null;
@@ -229,9 +229,7 @@ public class Customer
 				             try
 				             {
 						     Class.forName("oracle.jdbc.driver.OracleDriver");
-				             String user = "adhaval";	// For example, "jsmith"
-				             String passwd = "200263183";	// Your 9 digit student ID number or password
-							 
+				         						 
 							 Connection conn = null;
 					         Statement stmt = null;
 					         PreparedStatement p_st = null;
@@ -240,12 +238,6 @@ public class Customer
 					         {
 					          		conn = DriverManager.getConnection(jdbcURL, user, passwd);
 					          		stmt = conn.createStatement();
-//					          		rs = stmt.executeQuery("SELECT MAX(CUSTOMER_ID) AS C_ID FROM CUSTOMERS");
-//				            		int customer_id=0;
-//				            		while (rs.next()) {
-//				            			customer_id = rs.getInt("C_ID");
-//				            		}
-//				            		customer_id = customer_id+1;
 					          		String q = "INSERT INTO VEHICLES(CUSTOMER_ID, LICENCE_PLATE_NO, MANUFACTURER, MODEL, YEAR, DATE_OF_PURCHASE)"+
 					          		            "VALUES (?,?,?,?,?,?)";
 					          		p_st = conn.prepareStatement(q);
@@ -309,9 +301,7 @@ public class Customer
 	{
 		int cnt =0;
 		int profile_choice;
-		String model = null, manufacturer = null;
-		String user = "adhaval";	// For example, "jsmith"
-		String passwd = "200263183";
+		String model = null, manufacturer = null;		
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("To begin scheduling, enter your car details as follows :");
 		System.out.println("---------------------------------------------------------");
@@ -410,6 +400,7 @@ public class Customer
 	{
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		int menu_choice;
+		String basic_services_needed;
 		do
 		{
 			System.out.println("Select which problem you are facing :");
@@ -425,19 +416,22 @@ public class Customer
 		    menu_choice = Integer.parseInt(buf.readLine());
 			if(menu_choice>0 && menu_choice<8)
 			{
-				diagnostic_report(menu_choice,model,manufacturer);
+				basic_services_needed = diagnostic_report(menu_choice,model,manufacturer);
+				break;
 			}//if
+			else if(menu_choice==8)
+				break;
 			else
 			{
-				break;
-			}//else
+				System.out.println("Invalid problem entered. Please try again!!");
+			}
 		}while(menu_choice!=8);
 	}//schedule_repair 
 	
-	public void diagnostic_report(int prob_num, String model, String manufacturer)
+	public String diagnostic_report(int prob_num, String model, String manufacturer)
 	{
 		String specific_problem="", diagnostic="";
-		ArrayList<String> basic_services = new ArrayList<String>();
+		String basic_services = "";
 		float diagnostic_fee= 0;
 		String q = "SELECT specific_problem,diagnostic,diagnostic_fee,basic_service_name from Repair_manual where manual_id="+"'"+prob_num+"'";
 		ResultSet rs;
@@ -450,7 +444,7 @@ public class Customer
 		    specific_problem = rs.getString("SPECIFIC_PROBLEM");
 		    diagnostic = rs.getString("DIAGNOSTIC");
 		    diagnostic_fee = rs.getFloat("DIAGNOSTIC_FEE");
-		    basic_services.add(rs.getString("BASIC_SERVICE_NAME"));
+		    basic_services = rs.getString("BASIC_SERVICE_NAME");
 		}//while
 		}catch(Throwable oops)
 		{
@@ -462,9 +456,8 @@ public class Customer
 		System.out.println("Problem faced : "+specific_problem);
 		System.out.println("Diagnostic : "+diagnostic);
 		System.out.println("Diagnostic fee : "+diagnostic_fee);
-		System.out.println("Basic services needed : ");
-		for(int i=0;i<basic_services.size();i++)
-			System.out.println(i+1+ ". "+basic_services.get(i));
+		System.out.println("Basic services needed : "+basic_services);
+		return basic_services;
 	}//diagnostic_report
 	
 	public void reschedule_service()

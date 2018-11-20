@@ -127,7 +127,7 @@ public class Manager {
 			oops.printStackTrace();
 		}
 		System.out.println("");
-		
+		close(rs);
 	}//view_profile
 	
 	void update_profile()
@@ -169,7 +169,7 @@ public class Manager {
 			oops.printStackTrace();
 		}
 		System.out.println("");
-
+		close(rs);
 	}//view_customer_profile
 	
 	void add_new_employees()throws IOException
