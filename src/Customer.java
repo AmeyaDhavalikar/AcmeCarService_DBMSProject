@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 import java.io.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -123,14 +121,12 @@ public class Customer
 			    String model = rs.getString("MODEL");
 			    int year = rs.getInt("YEAR");
 			    String datePurchase = rs.getDate("DATE_OF_PURCHASE").toString();
-			    String mileage="";
+			    int mileage;
 			    String dateLastService="";
 			    if (rs.getDate("DATE_OF_LAST_SERVICE")!=null) {
 			    	dateLastService = rs.getDate("DATE_OF_LAST_SERVICE").toString();
 			    }
-			    if (rs.getDate("MILEAGE_OF_LAST_SERVICE")!=null) {
-			    	mileage = rs.getDate("MILEAGE_OF_LAST_SERVICE").toString();
-			    }
+			    mileage = rs.getInt("MILEAGE_OF_LAST_SERVICE");
 			    String typeOfService = rs.getString("TYPE_OF_LAST_SERVICE");
 			    String repairedProblem = rs.getString("REPAIRED_PROBLEM");
 			    //long zipcode = rs.getLong("DATE_OF_PURCHASE");
@@ -142,12 +138,12 @@ public class Customer
 			    System.out.println("Date of purchase: "+datePurchase);
 			    System.out.print("Latest Service info: ");
 			    if(dateLastService!="") {
-			    	System.out.print(mileage+" miles");
+			    	System.out.print(mileage+" miles ");
 			    	if(typeOfService=="R") {
 			    		System.out.print(repairedProblem+" on ");
 			    	}
 			    	else {
-			    		System.out.print("Serivce "+ typeOfService+"on ");
+			    		System.out.print("Service "+ typeOfService+" on ");
 			    	}
 			    	System.out.println(dateLastService);
 			    }
@@ -197,8 +193,53 @@ public class Customer
 	}//view_profile
 
 	
-	void update_profile()
-	{}
+	void update_profile() throws NumberFormatException, IOException
+	{
+		int profile_choice;
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		do
+		{
+			System.out.println("1. Name");
+			System.out.println("2. Address");
+			System.out.println("3. Phone Number");
+			System.out.println("4. Password");
+			System.out.println("5. Go Back");
+			System.out.println("Enter your choice: ");
+			profile_choice = Integer.parseInt(buf.readLine());
+			UpdateQueries update = new UpdateQueries();
+			switch(profile_choice)
+			{
+				case 1 : System.out.println("Enter name");
+						 String name = buf.readLine();
+						 update.update_db("update customers set name = "+"'"+name+"'"+" where email="+"'"+email+"'");
+						 break;
+				case 2 : System.out.println("Address details :");
+						 System.out.println("Enter street :");
+				         String street = buf.readLine();
+				         System.out.println("Enter city :");
+				         String city = buf.readLine();
+				         System.out.println("Enter state :");
+				         String state = buf.readLine();
+				         System.out.println("Enter zipcode :");
+				         int zipcode = Integer.parseInt(buf.readLine());
+				         update.update_db("update customers set city = "+"'"+city+"'"+",state = "+"'"+state+"'"+",street = "+"'"+street+"'"+",zipcode = "+zipcode+" where email="+"'"+email+"'");
+						 break;
+				case 3 : System.out.println("Enter Phone number");
+	 					 long phonenumber = Long.parseLong(buf.readLine());
+	                     update.update_db("update customers set PHONE_NUMBER = "+phonenumber+" where email="+"'"+email+"'");
+						 break;
+				case 4 : System.out.println("Enter new password");
+						 String password = buf.readLine();
+				         update.update_db("update customers set PASSWORD = "+"'"+password+"'"+" where email="+"'"+email+"'");
+					     break;
+				case 5 : break;
+				default : System.out.println("Invalid choice entered");
+			}//switch
+		}while(profile_choice!=5);
+		
+	 }
+		
+		
 	
 	void register_car() throws IOException
 	{

@@ -130,10 +130,51 @@ public class Manager {
 		close(rs);
 	}//view_profile
 	
-	void update_profile()
+	void update_profile() throws NumberFormatException, IOException
 	{
+		int profile_choice;
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		do
+		{
+			System.out.println("1. Name");
+			System.out.println("2. Address");
+			System.out.println("3. Phone Number");
+			System.out.println("4. Password");
+			System.out.println("5. Go Back");
+			System.out.println("Enter your choice: ");
+			profile_choice = Integer.parseInt(buf.readLine());
+			UpdateQueries update = new UpdateQueries();
+			switch(profile_choice)
+			{
+				case 1 : System.out.println("Enter name");
+						 String name = buf.readLine();
+						 update.update_db("update customers set name = "+"'"+name+"'"+" where email="+"'"+user_id+"'");
+						 break;
+				case 2 : System.out.println("Address details :");
+						 System.out.println("Enter street :");
+				         String street = buf.readLine();
+				         System.out.println("Enter city :");
+				         String city = buf.readLine();
+				         System.out.println("Enter state :");
+				         String state = buf.readLine();
+				         System.out.println("Enter zipcode :");
+				         int zipcode = Integer.parseInt(buf.readLine());
+				         update.update_db("update customers set city = "+"'"+city+"'"+",state = "+"'"+state+"'"+",street = "+"'"+street+"'"+",zipcode = "+zipcode+" where email="+"'"+user_id+"'");
+						 break;
+				case 3 : System.out.println("Enter Phone number");
+	 					 long phonenumber = Long.parseLong(buf.readLine());
+	                     update.update_db("update customers set PHONE_NUMBER = "+phonenumber+" where email="+"'"+user_id+"'");
+						 break;
+				case 4 : System.out.println("Enter new password");
+						 String password = buf.readLine();
+				         update.update_db("update customers set PASSWORD = "+"'"+password+"'"+" where email="+"'"+user_id+"'");
+					     break;
+				case 5 : break;
+				default : System.out.println("Invalid choice entered");
+			}//switch
+		}while(profile_choice!=5);
 		
-	}//update_profile
+	 }
 	
 	void view_customer_profile()throws IOException
 	{
