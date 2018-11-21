@@ -502,7 +502,36 @@ public class Manager {
 	}//payroll_method
 	
 	void view_inventory()
-	{}//inventory method
+	{
+
+		String q = "select parts.part_id as partID,parts.name as partName,has_stocks.current_quantity as currentQuantity,parts.unit_price as unitPrice,has_stocks.minimum_quantity_threshold as minQuantitythreshold,has_stocks.minimum_order_threshold as minOrderthreshold from parts,has_stocks where parts.part_id=has_stocks.part_id and parts.manufacturer=has_stocks.manufacturer and has_stocks.center_id =(select center_id from employees where employee_id="+"'"+ user_id+"')";
+		ResultSet rs;
+		ReadQueries obj = new ReadQueries();
+		rs = obj.read_db(q);
+		
+		try {
+		while (rs.next()) {
+			System.out.println("----------------------------------------------------------------------------------------");
+		    String part_id = rs.getString("partID");
+		    String part_name = rs.getString("partName");
+		    int currentquantity = rs.getInt("currentQuantity");
+		    int unitprice = rs.getInt("unitPrice");
+		    int min_quantity_threshold = rs.getInt("minQuantitythreshold");
+		    int min_order_threshold = rs.getInt("minOrderthreshold");
+		    System.out.println("Part id: " + part_id);
+		    System.out.println("Part name: " + part_name);
+		    System.out.println("Current quantity: " + currentquantity);
+		    System.out.println("Unit Price: " + unitprice);
+		    System.out.println("Minimum quantity threshold: " + min_quantity_threshold);
+		    System.out.println("Minimum order threshold: " + min_order_threshold);
+		}//while
+		}catch(Throwable oops)
+		{
+			oops.printStackTrace();
+		}
+		System.out.println("");
+		close(rs);
+	}//inventory method
 	
 	void orders()
 	{}//orders method
