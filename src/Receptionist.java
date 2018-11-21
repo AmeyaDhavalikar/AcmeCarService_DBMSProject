@@ -50,9 +50,9 @@ public class Receptionist
 						break;
 				case 4 :
 						break;
-				case 5 :
+				case 5 :schedule_service();
 						break;
-				case 6 :
+				case 6 : 
 						break;
 				case 7 :
 						break;
@@ -287,8 +287,14 @@ public class Receptionist
 	void view_service_history()
 	{}
 	
-	void schedule_service()
-	{}
+	void schedule_service()throws IOException
+	{
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Enter email address of the custome for whom you want to schedule the service :");
+		String email_address = buf.readLine();
+		Customer obj = new Customer(email_address);
+		obj.service();
+	}
 	
 	void reschedule_service()
 	{}

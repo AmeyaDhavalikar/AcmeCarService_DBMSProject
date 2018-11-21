@@ -431,7 +431,7 @@ public class Manager {
 	}//add_new_employee method
 
 	void payroll()throws IOException
-	{/*
+	{
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		int menu_choice;
 		
@@ -445,7 +445,7 @@ public class Manager {
 			{
 				case 1 : System.out.println("Enter employee id :");
 				 		 String emp_id = buf.readLine();
-				 		 String q1 = "SELECT NAME, SALARY FROM MANAGERS WHERE EMPLOYEE_ID = " + emp_id;
+				 		/* String q1 = "SELECT NAME, SALARY FROM MANAGERS WHERE EMPLOYEE_ID = " + emp_id;
 				 		 ResultSet rs;
 				 		 ReadQueries obj = new ReadQueries();
 				 		 rs = obj.read_db(q);
@@ -493,18 +493,18 @@ public class Manager {
 						}catch(Throwable oops)
 						{
 							oops.printStackTrace();
-						}
+						}*/
 				 		 break;
 				case 2 : break;
 				default : System.out.println("Invalid choice entered");
 			}//switch
-		}while(menu_choice!=2); */
+		}while(menu_choice!=2); 
 	}//payroll_method
 	
 	void view_inventory()
 	{
 
-		String q = "select parts.part_id as partID,parts.name as partName,has_stocks.current_quantity as currentQuantity,parts.unit_price as unitPrice,has_stocks.minimum_quantity_threshold as minQuantitythreshold,has_stocks.minimum_order_threshold as minOrderthreshold from parts,has_stocks where parts.part_id=has_stocks.part_id and parts.manufacturer=has_stocks.manufacturer and has_stocks.center_id =(select center_id from employees where employee_id="+"'"+ user_id+"')";
+		String q = "select parts.part_id as partID,parts.name as partName,has_stocks.current_quantity as currentQuantity,parts.unit_price as unitPrice,has_stocks.minimum_quantity_threshold as minQuantitythreshold,has_stocks.minimum_order_threshold as minOrderthreshold,has_stocks.manufacturer from parts,has_stocks where parts.part_id=has_stocks.part_id and parts.manufacturer=has_stocks.manufacturer and has_stocks.center_id =(select center_id from employees where employee_id="+"'"+ user_id+"')";
 		ResultSet rs;
 		ReadQueries obj = new ReadQueries();
 		rs = obj.read_db(q);
@@ -514,12 +514,14 @@ public class Manager {
 			System.out.println("----------------------------------------------------------------------------------------");
 		    String part_id = rs.getString("partID");
 		    String part_name = rs.getString("partName");
+		    String manufacturer = rs.getString("manufacturer");
 		    int currentquantity = rs.getInt("currentQuantity");
 		    int unitprice = rs.getInt("unitPrice");
 		    int min_quantity_threshold = rs.getInt("minQuantitythreshold");
 		    int min_order_threshold = rs.getInt("minOrderthreshold");
 		    System.out.println("Part id: " + part_id);
 		    System.out.println("Part name: " + part_name);
+		    System.out.println("Manufacturer: " +manufacturer);
 		    System.out.println("Current quantity: " + currentquantity);
 		    System.out.println("Unit Price: " + unitprice);
 		    System.out.println("Minimum quantity threshold: " + min_quantity_threshold);
@@ -549,6 +551,7 @@ public class Manager {
 	{}//service_history
 	
 	void invoices()
+	
 	{}//invoices
 	
 	 static void close(Connection conn) {

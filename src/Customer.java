@@ -147,9 +147,7 @@ public class Customer
 			    }
 			    else {
 			    	System.out.println("NULL");
-			    }
-			    
-			    
+			    }			    			    
 			}//while
 			}catch(Throwable oops)
 			{
@@ -267,8 +265,7 @@ public class Customer
 							int hadResults=0;
 				             try
 				             {
-						     Class.forName("oracle.jdbc.driver.OracleDriver");
-				         						 
+						     Class.forName("oracle.jdbc.driver.OracleDriver");				         						 
 							 Connection conn = null;
 					         Statement stmt = null;
 					         PreparedStatement p_st = null;
@@ -432,8 +429,25 @@ public class Customer
 		}while(profile_choice!=3);
 	}//schedule service
 	
-	public void schedule_maintenance()
-	{}
+	public void schedule_maintenance()throws IOException
+	{
+		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
+		int menu_choice;
+		{			
+			System.out.println("2. Find service date :");
+			System.out.println("2. Go back");			
+			System.out.println("Enter your choice: ");
+			menu_choice = Integer.parseInt(buf.readLine());
+			switch(menu_choice)
+			{
+				case 1 : 
+						 break;
+				case 2 : 
+						 break;		
+				default : System.out.println("Invalid choice entered");
+			}//switch
+		}while(menu_choice!=2);
+	}
 	
 	public void schedule_repair(String model, String manufacturer, String center_id)throws IOException
 	{
@@ -448,6 +462,7 @@ public class Customer
 		float diagnostic_fee= 0;
 		int remaining_quantity =0;
 		int min_order_threshold, min_quantity_threshold = 0, current_quantity = 0;
+		System.out.println("Center id inside repair: " + center_id + " "+model+" "+ manufacturer);
 		do
 		{
 			System.out.println("Select which problem you are facing :");
@@ -514,6 +529,7 @@ public class Customer
 				ResultSet rs2;
 							
 				ReadQueries obj2 = new ReadQueries();
+				System.out.println("Center "+center_id + " Manf " +manufacturer + " Part "+part_id);
 				String q2 = "SELECT CURRENT_QUANTITY, MINIMUM_ORDER_THRESHOLD, MINIMUM_QUANTITY_THRESHOLD FROM HAS_STOCKS WHERE CENTER_ID = '"+center_id+"' AND MANUFACTURER = '"+manufacturer+"' AND PART_ID = '"+part_id+"'";
 				rs2 = obj2.read_db(q2);
 				try {
@@ -540,7 +556,7 @@ public class Customer
 					//check how many parts are there
 					//if parts<min_order threshold, then order the min_order_threshold, otherwise order the parts
 					//update the status as "ordered" and save the ordered_quantity
-					//run scheduling starting from -> (expected delivery date +1,preffered mechanic)
+					//run scheduling starting from -> (expected delivery date +1,preferred mechanic)
 				}//else
 				//display the two dates after the scheduling algorithm runs
 				//ask the customer to choose one date
