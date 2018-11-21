@@ -7,7 +7,7 @@ public class SignUp {
 	{
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		int menu_choice;
-		System.out.println("Enter email address : ");
+		System.out.println("Enter Gmail email address : ");
 		String email_id = buf.readLine();
 		System.out.println("Enter password :");
 		String password = buf.readLine();

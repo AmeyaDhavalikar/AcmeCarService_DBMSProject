@@ -133,8 +133,6 @@ public class Customer
 			    }
 			    String typeOfService = rs.getString("TYPE_OF_LAST_SERVICE");
 			    String repairedProblem = rs.getString("REPAIRED_PROBLEM");
-			    //long zipcode = rs.getLong("DATE_OF_PURCHASE");
-			    //String email = rs.getString("EMAIL");
 			    System.out.println("Licence Plate no: " + licence_plate_no);
 			    System.out.println("Make: " + make);
 			    System.out.println("Model: " + model);
@@ -301,7 +299,8 @@ public class Customer
 	{
 		int cnt =0;
 		int profile_choice;
-		String model = null, manufacturer = null;		
+		String model = null, manufacturer = null;	
+		String center_id = "";
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("To begin scheduling, enter your car details as follows :");
 		System.out.println("---------------------------------------------------------");
@@ -348,7 +347,6 @@ public class Customer
 	    	Class.forName("oracle.jdbc.driver.OracleDriver");
 			con = DriverManager.getConnection(jdbcURL, user, passwd);
           	stm = con.createStatement();
-          	String center_id = "";
           	String query = "SELECT CENTER_ID FROM CUSTOMERS WHERE EMAIL = '"+email+"'"; 
           	r1 = stm.executeQuery(query);
           	while(r1.next())
@@ -385,7 +383,7 @@ public class Customer
 			{
 				case 1 : schedule_maintenance();
 						 break;
-				case 2 : schedule_repair(model, manufacturer);
+				case 2 : schedule_repair(model, manufacturer,center_id);
 						 break;
 				case 3 : break;			
 				default : System.out.println("Invalid choice entered");
@@ -396,11 +394,19 @@ public class Customer
 	public void schedule_maintenance()
 	{}
 	
-	public void schedule_repair(String model, String manufacturer)throws IOException
+	public void schedule_repair(String model, String manufacturer, String center_id)throws IOException
 	{
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
 		int menu_choice;
+		String part_id="";
+		float total_cost=0,hrs_to_complete=0;
+		int required_quantity=0;
 		String basic_services_needed;
+		String specific_problem="", diagnostic="";
+		String basic_services = "";
+		float diagnostic_fee= 0;
+		int remaining_quantity =0;
+		int min_order_threshold, min_quantity_threshold = 0, current_quantity = 0;
 		do
 		{
 			System.out.println("Select which problem you are facing :");
@@ -415,8 +421,88 @@ public class Customer
 			System.out.println("Enter your choice:");
 		    menu_choice = Integer.parseInt(buf.readLine());
 			if(menu_choice>0 && menu_choice<8)
-			{
-				basic_services_needed = diagnostic_report(menu_choice,model,manufacturer);
+			{				
+				String q = "SELECT specific_problem,diagnostic,diagnostic_fee,basic_service_name from Repair_manual where manual_id="+"'"+menu_choice+"'";
+				ResultSet rs;
+				ReadQueries obj = new ReadQueries();
+				rs = obj.read_db(q);
+				int customer_id=0;
+				try {
+					int i=0;
+				while (rs.next()) {
+				    specific_problem = rs.getString("SPECIFIC_PROBLEM");
+				    diagnostic = rs.getString("DIAGNOSTIC");
+				    diagnostic_fee = rs.getFloat("DIAGNOSTIC_FEE");
+				    basic_services = rs.getString("BASIC_SERVICE_NAME");
+				}//while
+				}catch(Throwable oops)
+				{
+					oops.printStackTrace();
+				}
+				close(rs);
+				System.out.println("-------------------------------------------------------------------------");
+				System.out.println("----------------------------DIAGNOSTIC REPORT----------------------------");
+				System.out.println("-------------------------------------------------------------------------");
+				System.out.println("Problem faced : "+specific_problem);
+				System.out.println("Diagnostic : "+diagnostic);
+				System.out.println("Diagnostic fee : "+diagnostic_fee);
+				System.out.println("Basic services needed : "+basic_services);
+				
+				String basic_serv[] = basic_services.split(", ");
+				for(int i=0;i<basic_serv.length;i++)
+					basic_serv[i] = basic_serv[i].trim();
+				
+				ResultSet rs1;
+				ReadQueries obj1 = new ReadQueries();
+				String q1 = "SELECT part_id, part_quantity,hours_to_complete,total_cost from basic_services where UPPER(name) = "+"'"+basic_serv[0].toUpperCase()+"' and model = '"+model+"' and manufacturer = '"+manufacturer+"'";
+				rs1 = obj1.read_db(q1);
+				try {
+				while (rs1.next()) {
+				    part_id = rs1.getString("part_id");
+				    total_cost = rs1.getFloat("TOTAL_COST");
+				    hrs_to_complete = rs1.getFloat("HOURS_TO_COMPLETE");
+				    required_quantity = rs1.getInt("part_quantity");
+				    System.out.println(part_id +" "+total_cost+" "+hrs_to_complete+" "+required_quantity);
+				}//while
+				}catch(Throwable oops)
+				{
+					oops.printStackTrace();
+				}
+				close(rs1);
+				
+				ResultSet rs2;
+							
+				ReadQueries obj2 = new ReadQueries();
+				String q2 = "SELECT CURRENT_QUANTITY, MINIMUM_ORDER_THRESHOLD, MINIMUM_QUANTITY_THRESHOLD FROM HAS_STOCKS WHERE CENTER_ID = '"+center_id+"' AND MANUFACTURER = '"+manufacturer+"' AND PART_ID = '"+part_id+"'";
+				rs2 = obj2.read_db(q2);
+				try {
+				while (rs2.next()) {				   
+				    current_quantity = rs2.getInt("current_quantity");
+				    min_order_threshold = rs2.getInt("MINIMUM_ORDER_THRESHOLD");
+				    min_quantity_threshold = rs2.getInt("MINIMUM_QUANTITY_THRESHOLD");
+				    System.out.println(current_quantity+" "+min_order_threshold+" "+min_quantity_threshold);
+				}//while
+				}catch(Throwable oops)
+				{
+					oops.printStackTrace();
+				}
+				close(rs2);
+				remaining_quantity = current_quantity - required_quantity;			
+				if(remaining_quantity>min_quantity_threshold)
+				{
+					//mark the remaining quantity as "reserved" and save the quantity value in reserved_quantity of has_stocks
+					//update the current quantity to remaining quantity
+					//run scheduling scheduling starting from (current_date+1, preferred mechanic)
+				}//if
+				else
+				{
+					//check how many parts are there
+					//if parts<min_order threshold, then order the min_order_threshold, otherwise order the parts
+					//update the status as "ordered" and save the ordered_quantity
+					//run scheduling starting from -> (expected delivery date +1,preffered mechanic)
+				}//else
+				//display the two dates after the scheduling algorithm runs
+				//ask the customer to choose one date
 				break;
 			}//if
 			else if(menu_choice==8)
@@ -427,38 +513,6 @@ public class Customer
 			}
 		}while(menu_choice!=8);
 	}//schedule_repair 
-	
-	public String diagnostic_report(int prob_num, String model, String manufacturer)
-	{
-		String specific_problem="", diagnostic="";
-		String basic_services = "";
-		float diagnostic_fee= 0;
-		String q = "SELECT specific_problem,diagnostic,diagnostic_fee,basic_service_name from Repair_manual where manual_id="+"'"+prob_num+"'";
-		ResultSet rs;
-		ReadQueries obj = new ReadQueries();
-		rs = obj.read_db(q);
-		int customer_id=0;
-		try {
-			int i=0;
-		while (rs.next()) {
-		    specific_problem = rs.getString("SPECIFIC_PROBLEM");
-		    diagnostic = rs.getString("DIAGNOSTIC");
-		    diagnostic_fee = rs.getFloat("DIAGNOSTIC_FEE");
-		    basic_services = rs.getString("BASIC_SERVICE_NAME");
-		}//while
-		}catch(Throwable oops)
-		{
-			oops.printStackTrace();
-		}
-		System.out.println("-------------------------------------------------------------------------");
-		System.out.println("----------------------------DIAGNOSTIC REPORT----------------------------");
-		System.out.println("-------------------------------------------------------------------------");
-		System.out.println("Problem faced : "+specific_problem);
-		System.out.println("Diagnostic : "+diagnostic);
-		System.out.println("Diagnostic fee : "+diagnostic_fee);
-		System.out.println("Basic services needed : "+basic_services);
-		return basic_services;
-	}//diagnostic_report
 	
 	public void reschedule_service()
 	{}//reschedule service
