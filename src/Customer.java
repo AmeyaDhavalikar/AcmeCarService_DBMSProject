@@ -446,7 +446,7 @@ public class Customer
 			profile_choice = Integer.parseInt(buf.readLine());
 			switch(profile_choice)
 			{
-				case 1 : schedule_maintenance();
+				case 1 : schedule_maintenance(licence_plate_no,model,manufacturer,center_id,current_mileage,performing_mechanic);
 						 break;
 				case 2 : schedule_repair(model, manufacturer,center_id);
 						 break;
@@ -460,6 +460,86 @@ public class Customer
     	}
 	}//schedule service
 	
+public void previous_service(String licence_plate,int current_mileage,String model,String manufacturer) {
+		
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+		LocalDate localDate = LocalDate.now();
+		String date=dtf.format(localDate).toString();
+		 
+		String q="select service_type from service_history where service_date <='"+date+"' and LICENCE_PLATE_NO='"+licence_plate+"' and service_type='A|B|C' and ROWNUM = 1";
+		ResultSet rs;
+		ReadQueries obj = new ReadQueries();
+		rs = obj.read_db(q);
+		String service_type="";
+		try {
+		while (rs.next()) {
+		    service_type = rs.getString("service_type");
+		}
+		//while
+		}
+		catch(Throwable oops)
+		{
+			oops.printStackTrace();
+		}
+		close(rs);
+		int firsttime=0;
+		if (service_type=="") {
+			firsttime=1;
+		}
+		String query="select miles,service_type from MAINTENANCE_MANUAL where upper(model)='"+model.toUpperCase()+"' and upper(manufacturer)='"+manufacturer.toUpperCase()+"'";
+		ResultSet rs1;;
+		ReadQueries obj1 = new ReadQueries();
+		rs = obj1.read_db(query);
+		ArrayList<Integer>  miles= new ArrayList<Integer>();
+		ArrayList<String> serviceTypes = new ArrayList<String>();
+		String service_type1="";
+		int previous_mileage=0;
+		int max_mileage=0;
+		int m=0;
+		try {
+			while(rs.next()) {
+				m=m+rs.getInt("miles");
+				miles.add(m);
+				String s=rs.getString("service_type");
+				serviceTypes.add(s);
+				System.out.println(s);
+				if (s.equals("C")) {			
+					max_mileage=m;
+				}
+		}
+		}
+		catch(Throwable oops)
+		{
+			oops.printStackTrace();
+		}
+		close(rs);
+		int presentrange=0;
+		if(current_mileage >max_mileage) {
+			presentrange=current_mileage%max_mileage;
+		} 
+		else {
+			presentrange=current_mileage;
+		}
+		String presentServiceType="";
+		System.out.println(presentrange);
+		
+		if(0<= presentrange & presentrange<= miles.get(0)) {
+				presentServiceType="A";
+		}
+		else if(miles.get(0) < presentrange & presentrange<=miles.get(1)) {
+					presentServiceType ="B";
+		}
+		else if(miles.get(1)< presentrange & presentrange<=miles.get(2)) {
+					presentServiceType="C";
+		}
+		System.out.println("The service type is"+presentServiceType);
+		return ;
+		
+	}
+	
+
+
+
 	public void schedule_maintenance()throws IOException
 	{
 		BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
@@ -471,7 +551,7 @@ public class Customer
 			menu_choice = Integer.parseInt(buf.readLine());
 			switch(menu_choice)
 			{
-				case 1 : 
+				case 1 : previous_service(licence_plate_no,current_mileage,model,manufacturer);
 						 break;
 				case 2 : 
 						 break;		
