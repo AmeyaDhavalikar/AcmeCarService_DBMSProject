@@ -82,19 +82,25 @@ public class RepairService {
 				String basic_serv[] = basic_services.split(", ");
 				for(int i=0;i<basic_serv.length;i++)
 					basic_serv[i] = basic_serv[i].trim();
-				System.out.println("Basic service is : "+basic_serv[0]);
+				int k;
+				float total_cost_services=0, total_time=0;
+				boolean order_needed = false;
+				for(k=0;k<basic_serv.length;k++)
+				{
 				ResultSet rs1;
 				ReadQueries obj1 = new ReadQueries();
-				String q1 = "SELECT part_name, part_quantity,hours_to_complete,total_cost from basic_services where UPPER(name) = '"+basic_serv[0].toUpperCase()+"' and model = '"+model+"' and manufacturer = '"+manufacturer+"'";
+				String q1 = "SELECT part_name, part_quantity,hours_to_complete,total_cost from basic_services where UPPER(name) = '"+basic_serv[k].toUpperCase()+"' and model = '"+model+"' and manufacturer = '"+manufacturer+"'";
 				rs1 = obj1.read_db(q1);
 				
 				try {
 				while (rs1.next()) {
 				    part_name = rs1.getString("part_name");
 				    total_cost = rs1.getFloat("TOTAL_COST");
+				    total_cost_services+=total_cost;
 				    hrs_to_complete = rs1.getFloat("HOURS_TO_COMPLETE");
+				    total_time+=hrs_to_complete;
 				    required_quantity = rs1.getInt("part_quantity");
-				    System.out.println(part_name +" "+total_cost+" "+hrs_to_complete+" "+required_quantity);
+				    //System.out.println(part_name +" "+total_cost+" "+hrs_to_complete+" "+required_quantity);
 				}//while
 				}catch(Throwable oops)
 				{
@@ -120,9 +126,8 @@ public class RepairService {
 				close(rs3);
 				
 				ResultSet rs2;
-				System.out.println("Here!!!");
 				ReadQueries obj2 = new ReadQueries();
-				System.out.println("Center "+center_id + " Manf " +manufacturer + " Part "+part_id);
+				//System.out.println("Center "+center_id + " Manf " +manufacturer + " Part "+part_id);
 				String q2 = "SELECT CURRENT_QUANTITY, MINIMUM_ORDER_THRESHOLD, MINIMUM_QUANTITY_THRESHOLD FROM HAS_STOCKS WHERE CENTER_ID = '"+center_id+"' AND MANUFACTURER = '"+manufacturer+"' AND PART_ID = '"+part_id+"'";
 				rs2 = obj2.read_db(q2);
 
@@ -131,23 +136,31 @@ public class RepairService {
 				    current_quantity = rs2.getInt("current_quantity");
 				    min_order_threshold = rs2.getInt("MINIMUM_ORDER_THRESHOLD");
 				    min_quantity_threshold = rs2.getInt("MINIMUM_QUANTITY_THRESHOLD");
-				    System.out.println(current_quantity+" "+min_order_threshold+" "+min_quantity_threshold);
+				    System.out.println("Current quantity : "+current_quantity+" Minimum order thresold : "+min_order_threshold+"Minimum quantity threshold "+min_quantity_threshold);
 				}//while
 				}catch(Throwable oops)
 				{
 					oops.printStackTrace();
 				}
 				close(rs2);
-				System.out.println("Here again!!");
 				remaining_quantity = current_quantity - required_quantity;			
 				if(remaining_quantity>min_quantity_threshold)
 				{
+					
 					//mark the required quantity as "reserved" and save the quantity value in reserved_quantity of has_stocks
 					//update the current quantity to remaining quantity
+					UpdateQueries update = new UpdateQueries();
+					String update_stocks = "UPDATE HAS_STOCKS set current_quantity = '"+remaining_quantity+"' and status = 'Reserved' and reserved_quantity = '"+required_quantity+"' where center_id = '"+center_id+"' and manufacturer = '"+manufacturer+"' and part_id = '"+part_id+"'";
+					update.update_db(update_stocks);
 					//run scheduling scheduling starting from (current_date+1, preferred mechanic)
 				}//if
 				else
 				{
+					
+					order_needed = true;
+					UpdateQueries update1 = new UpdateQueries();
+					String update_stocks1 = "UPDATE HAS_STOCKS set status = 'Ordered' and ordered_quantity = '"+required_quantity+"' where center_id = '"+center_id+"' and manufacturer = '"+manufacturer+"' and part_id = '"+part_id+"'";
+					update1.update_db(update_stocks1);
 					//check how many parts are there
 					//if parts<min_order threshold, then order the min_order_threshold, otherwise order the parts
 					//update the status as "ordered" and save the ordered_quantity
@@ -155,6 +168,19 @@ public class RepairService {
 				}//else
 				//display the two dates after the scheduling algorithm runs
 				//ask the customer to choose one date
+				
+				}//for each basic service loop
+				
+				if(order_needed == true)
+				{
+					System.out.println("Oh no! Some parts aren't available at the service center presently. Hence, we will be ordering the parts and scheduling your service soon! ");
+				}//if
+				else
+				{
+					System.out.println("Wohoo! All parts needed for the service are available. We will schedule the service ASAP");
+				}//else
+				System.out.println("The total cost of this service will be : $"+total_cost_services);
+				System.out.println("The total time required for this service will be : "+total_time);
 				break;
 			}//if
 			else if(menu_choice==8)

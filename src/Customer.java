@@ -16,7 +16,7 @@ public class Customer
 {
 	private String email;
 	static final String jdbcURL = "jdbc:oracle:thin:@orca.csc.ncsu.edu:1521:orcl01";
-	
+	public String[] slot_mapping = {"","8am","8:30am","9am","9:30am","10am","10:30am","11am","11:30am","12pm","12:30pm","1pm","1:30pm","2pm","2:30pm","3pm","3:30pm","4pm","4:30pm","5pm","5:30pm","6pm","6:30pm",};
 	 public String user = "adhaval";	// For example, "jsmith"
      public String passwd = "200263183";	// Your 9 digit student ID number or password
 	
@@ -331,7 +331,36 @@ public class Customer
 	}//service
 	
 	public void view_service_history()
-	{}//view_service_history
+	{
+		int customer_id = get_customer_id(email);
+		String q = "SELECT service_history_id,licence_plate_no,service_type,slot_number from service_history where customer_id = '"+customer_id+"'";
+		ResultSet rs;
+		ReadQueries obj = new ReadQueries();
+		rs = obj.read_db(q);
+		int i =0;
+		try {
+		while (rs.next()) {
+			
+		    customer_id = rs.getInt("CUSTOMER_ID");
+		    String name = rs.getString("NAME");
+		    long phone_number = rs.getLong("PHONE_NUMBER");
+		    String city = rs.getString("CITY");
+		    String street = rs.getString("STREET");
+		    String state = rs.getString("STATE");
+		    long zipcode = rs.getLong("ZIPCODE");
+		    String email = rs.getString("EMAIL");
+		    System.out.println("Customer id: " + customer_id);
+		    System.out.println("Name: " + name);
+		    System.out.println("Phone number: " + phone_number);
+		    System.out.println("Address : " + street + ", "+ city + ", " + state + ", " + zipcode);
+		    System.out.println("Email address : " + email);
+		}//while
+		}catch(Throwable oops)
+		{
+			oops.printStackTrace();
+		}
+		
+	}//view_service_history
 	
 	public void schedule_service()throws IOException
 	{
@@ -455,6 +484,7 @@ public class Customer
 	{
 		RepairService obj = new RepairService(model,manufacturer,center_id);
 		obj.schedule_repair();
+		System.out.println("Scheduling your service!!......");
 	}//schedule_repair 
 	
 	public void reschedule_service()
